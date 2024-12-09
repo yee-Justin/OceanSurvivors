@@ -6,7 +6,7 @@
 #include "glm/glm.hpp"
 #include "ShaderProgram.h"
 enum EntityType { PLATFORM, PLAYER, ENEMY, HEALTH, PROJECTILE, OBJECT};
-enum AIType { PAUSED, FOLLOWER, BUBBLE };
+enum AIType { PAUSED, FOLLOWER, BUBBLE, ENEMY_PROJECTILE };
 enum AIState { WALKING, IDLE };
 
 
@@ -134,7 +134,7 @@ public:
     void speed_boost() { m_speed *= 1.25;}
     void pierce_boost() { pierce += 2; }
     void range_boost() { m_projectile_timer *= 1.25; m_projectile_time *= 1.25; }
-    void firerate_boost() { m_projectile_rate *= .8; m_projectile_timer *= .75; m_projectile_time *= .75; m_projectile_speed *= 1.2; }
+    void firerate_boost() { m_projectile_rate *= .8; m_projectile_timer *= .8; m_projectile_time *= .8; m_projectile_speed *= 1.1; }
     
     // ————— GETTERS ————— //
     EntityType const get_entity_type()    const { return m_entity_type; };
@@ -155,6 +155,7 @@ public:
     float get_rate() const { return m_projectile_rate;}
 	float get_timer() const { return m_projectile_time; }
 	float get_projectile_speed() const { return m_projectile_speed; }
+	float get_projectile_time() const { return m_projectile_time; }
 	int get_kills() const { return m_enemies_killed; }
 	int get_current_exp() const { return exp; }
 	int get_exp() const { return exp_amount; }
@@ -204,6 +205,7 @@ public:
     void const set_damage(float damage) { m_damage = damage; }
 	void const set_pierce(float pierce) { pierce = pierce; }
 	void const set_projectile_speed(float speed) { m_projectile_speed = speed; }
+	void const set_projectile_time(float time) { m_projectile_time = time; }
 	void const set_kills(int kills) { m_enemies_killed = kills; }
 	void const set_current_exp(int experience) { exp = experience; }
 	void const set_exp(int experience) { exp_amount = experience; }

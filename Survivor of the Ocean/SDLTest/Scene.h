@@ -24,7 +24,8 @@ struct GameState
     Entity* player;
 
     std::vector<Entity*> enemies;
-	
+    std::vector<Entity*> projectiles;
+
     Entity* bubble;
     Entity* menu;
     Entity* boss;
@@ -58,6 +59,7 @@ public:
 	float projectile_speed;
 	float projectile_rate;
     float projectile_timer;
+	float projectile_time;
     int current_exp;
 
     // ————— ATTRIBUTES ————— //
@@ -98,6 +100,8 @@ public:
     bool levelup = false;
 
     float attack_rate = 0;
+    float enemy_attack_rate = 0;
+
     // ————— METHODS ————— //
     virtual void initialise() = 0;
     virtual void update(float delta_time) = 0;

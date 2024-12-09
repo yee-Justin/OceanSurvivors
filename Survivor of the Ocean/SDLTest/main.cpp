@@ -248,9 +248,16 @@ void process_input()
 
 
         //bonus options
+        //Instant wins the stage
         if (key_state[SDL_SCANCODE_K])
         {
             g_current_scene->kill();
+        }
+
+        //levels up instantly
+        if (key_state[SDL_SCANCODE_L])
+        {
+            g_current_scene->get_state().player->add_exp(levelup_requirement);
         }
 
         //pauses the game
@@ -258,6 +265,8 @@ void process_input()
         {
             g_current_scene->turn_off();
         }
+
+
 
         if (glm::length(g_current_scene->get_state().player->get_movement()) > 5.0f)
         {
@@ -324,6 +333,8 @@ void update()
     float delta_time = ticks - g_previous_ticks;
     g_previous_ticks = ticks;
 
+
+    //updates the start screen when the current scene is start
 	if (g_current_scene == g_start)
 	{
 		g_current_scene->update(delta_time);
@@ -358,7 +369,7 @@ void update()
 
                 if (g_current_scene->get_state().player->get_current_exp() >= levelup_requirement)
                 {
-                    levelup_requirement *= 1.5;
+                    levelup_requirement *= 1.25;
                     levelup_requirement += 1;
                     level++;
                     g_current_scene->get_state().player->set_current_exp(0);
@@ -508,6 +519,7 @@ void level_clear()
         g_level_b->projectile_speed = g_level_a->get_state().player->get_projectile_speed();
         g_level_b->projectile_rate = g_level_a->get_state().player->get_rate();
         g_level_b->projectile_timer = g_level_a->get_state().player->get_timer();
+        g_level_b->projectile_time = g_level_a->get_state().player->get_projectile_time();
         g_level_b->current_exp = g_level_a->get_state().player->get_current_exp();
     }
 
@@ -521,6 +533,7 @@ void level_clear()
         g_level_c->projectile_speed = g_level_b->get_state().player->get_projectile_speed();
         g_level_c->projectile_rate = g_level_b->get_state().player->get_rate();
         g_level_c->projectile_timer = g_level_b->get_state().player->get_timer();
+        g_level_c->projectile_time = g_level_b->get_state().player->get_timer();
         g_level_c->current_exp = g_level_b->get_state().player->get_current_exp();
     }
 }

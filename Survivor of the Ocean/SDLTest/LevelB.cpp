@@ -9,7 +9,7 @@ SPRITESHEET_FILEPATH[] = "assets/whale.png",
 SHRIMP_FILEPATH[] = "assets/shrimp.png",
 BUBBLE_FILEPATH[] = "assets/bubble.png",
 CLAM_FILEPATH[] = "assets/clam.png",
-
+CLAMPROJECTILE_FILEPATH[] = "assets/clamprojectile.png",
 
 
 MAP_TILESET_FILEPATH[] = "assets/map.png", //From https://opengameart.org/content/tile-map-dark-2d-platformer
@@ -110,6 +110,7 @@ void LevelB::initialise()
 	m_game_state.player->set_health(current_health);
 	m_game_state.player->set_pierce(pierce);
 	m_game_state.player->set_projectile_speed(projectile_speed);
+    m_game_state.player->set_projectile_time(projectile_time);
 	m_game_state.player->set_rate(projectile_rate);
 	m_game_state.player->set_timer(projectile_timer);
 	m_game_state.player->set_current_exp(current_exp);
@@ -121,13 +122,14 @@ void LevelB::initialise()
     m_game_state.bubble->set_rate(m_game_state.player->get_rate());
     attack_rate = m_game_state.bubble->get_rate();
     m_game_state.bubble->set_timer(m_game_state.bubble->get_rate());
+	m_game_state.bubble->set_projectile_time(m_game_state.player->get_projectile_time());
 
     int random_pos;
     for (int i = 0; i < m_number_of_enemies; i++)
     {
         random_pos = rand() % 76; //picks a random position for the enemy to spawn
 
-        m_game_state.enemies.push_back(new Entity(clam_texture_id, 1.0f, 10.0f, 25.0f, 0.0f, 0.25f, 0.25f, ENEMY, FOLLOWER, IDLE));
+        m_game_state.enemies.push_back(new Entity(clam_texture_id, 1.0f, 10.0f, 25.0f, 0.0f, 0.5f, 0.5f, ENEMY, FOLLOWER, IDLE));
         m_game_state.enemies[i]->set_position(enemy_positions[random_pos]);
         m_game_state.enemies[i]->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
         m_game_state.enemies[i]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -139,6 +141,16 @@ void LevelB::initialise()
         m_game_state.enemies[i]->set_animation_index(0);
         m_game_state.enemies[i]->set_animation_time(0.0f);
         m_game_state.enemies[i]->set_walking(walking_animation);
+
+
+        m_game_state.projectiles.push_back(new Entity(clam_texture_id, 4.0f, 1.0, m_game_state.enemies[i]->get_damage(), 0.0f, 0.5f, 0.5f, ENEMY, ENEMY_PROJECTILE, IDLE));
+        m_game_state.projectiles[i]->deactivate();
+        m_game_state.projectiles[i]->set_position(m_game_state.enemies[i]->get_position());
+		m_game_state.projectiles[i]->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
+		m_game_state.projectiles[i]->set_scale(glm::vec3(.4f, .6f, 1.0f));
+		m_game_state.projectiles[i]->set_rate(1.0f);
+        enemy_attack_rate = m_game_state.projectiles[i]->get_rate();
+        m_game_state.projectiles[i]->set_timer(1.0f);
 
     }
 
@@ -185,7 +197,10 @@ void LevelB::update(float delta_time)
             }
             LevelB_timer = 0.0f;
         }
+
         attack_rate -= delta_time;
+		enemy_attack_rate -= delta_time;
+        
         if (m_game_state.player->get_is_active())
         {
             m_game_state.player->update(delta_time, m_game_state.player, NULL, 0,
@@ -213,7 +228,31 @@ void LevelB::update(float delta_time)
                     }
                 }
             }
-
+            /*
+            if (enemy_attack_rate <= 0.0f)
+            {
+                if (!m_game_state.bubble->get_is_active())
+                {
+                    m_game_state.bubble->set_position(m_game_state.player->get_position());
+                    m_game_state.bubble->set_health(m_game_state.player->get_pierce());
+                    m_game_state.bubble->set_damage(m_game_state.player->get_damage());
+                    m_game_state.bubble->set_rate(m_game_state.player->get_rate());
+                    m_game_state.bubble->set_timer(m_game_state.player->get_timer());
+                    m_game_state.bubble->set_speed(m_game_state.player->get_projectile_speed());
+                    attack_rate = m_game_state.bubble->get_rate();
+                    m_game_state.bubble->activate();
+                    Mix_PlayChannel(-1, m_game_state.bubble_sfx, 0);
+                    for (int i = 0; i < LevelB_current_enemies; i++)
+                    {
+                        if (m_game_state.enemies[i]->get_collided_projectile())
+                        {
+                            m_game_state.enemies[i]->change_projectile();
+                        }
+                    }
+                }
+            }
+            */
+            
             m_game_state.bubble->ai_bubble(mouse_position);
             m_game_state.bubble->update(delta_time, m_game_state.player, NULL, 0,
                 m_game_state.map);
@@ -225,12 +264,22 @@ void LevelB::update(float delta_time)
                 m_game_state.player->check_collision_y(m_game_state.enemies[i], 1);
                 m_game_state.bubble->check_collision_x(m_game_state.enemies[i], 1);
                 m_game_state.bubble->check_collision_y(m_game_state.enemies[i], 1);
+                /*
+                m_game_state.player->check_collision_x(m_game_state.projectiles[i], 1);
+                m_game_state.player->check_collision_y(m_game_state.projectiles[i], 1);
+                m_game_state.bubble->check_collision_x(m_game_state.projectiles[i], 1);
+                m_game_state.bubble->check_collision_y(m_game_state.projectiles[i], 1);
+             */
             }
         }
 
         for (int i = 0; i < LevelB_current_enemies; i++)
         {
-            m_game_state.enemies[i]->update(delta_time, m_game_state.player, NULL, 0, m_game_state.map);
+            m_game_state.enemies[i]->update(delta_time, m_game_state.player, NULL, 0, m_game_state.map);                
+            /*
+				m_game_state.projectiles[i]->ai_projectile(player_position);
+                m_game_state.projectiles[i]->m_game_state.enemies[i]->update(delta_time, m_game_state.player, NULL, 0, m_game_state.map);
+             */
         }
     }
     
