@@ -70,8 +70,12 @@ bool lose_sound = true;
 int level = 1;
 int levelup_requirement = 10;
 
-constexpr char V_SHADER_PATH[] = "shaders/vertex_textured.glsl",
-F_SHADER_PATH[] = "shaders/fragment_textured.glsl";
+
+//adding both fragment and lit glsls
+constexpr char  V_SHADER_PATH[] = "shaders/vertex_textured.glsl",
+F_SHADER_PATH[] = "shaders/fragment_textured.glsl",
+V_LIT_SHADER_PATH[] = "shaders/vertex_lit.glsl",
+F_LIT_SHADER_PATH[] = "shaders/fragment_lit.glsl";
 
 constexpr float MILLISECONDS_IN_SECOND = 1000.0;
 
@@ -93,7 +97,7 @@ enum AppStatus { RUNNING, TERMINATED };
 SDL_Window* g_display_window;
 
 AppStatus g_app_status = RUNNING;
-ShaderProgram g_shader_program;
+ShaderProgram g_shader_program, menu_shader_program;
 glm::mat4 g_view_matrix, g_projection_matrix;
 
 float g_previous_ticks = 0.0f,
@@ -158,15 +162,21 @@ void initialise()
     // ————— VIDEO SETUP ————— //
     glViewport(VIEWPORT_X, VIEWPORT_Y, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
+
+    //setting up a shader for the game and for the menu
     g_shader_program.load(V_SHADER_PATH, F_SHADER_PATH);
+	menu_shader_program.load(V_LIT_SHADER_PATH, F_LIT_SHADER_PATH);
 
     g_view_matrix = glm::mat4(1.0f);
     g_projection_matrix = glm::ortho(-10.0f, 10.0f, -7.5f, 7.5f, -1.0f, 1.0f);
 
     g_shader_program.set_projection_matrix(g_projection_matrix);
     g_shader_program.set_view_matrix(g_view_matrix);
+	menu_shader_program.set_projection_matrix(g_projection_matrix);
+	menu_shader_program.set_view_matrix(g_view_matrix);
 
-    glUseProgram(g_shader_program.get_program_id());
+	//starts as the menu shader
+    glUseProgram(menu_shader_program.get_program_id());
 
     glClearColor(BG_RED, BG_BLUE, BG_GREEN, BG_OPACITY);
 
@@ -226,12 +236,6 @@ void process_input()
 				}
 				break;
 
-            case SDLK_k:
-				// Instant win
-				if (g_current_scene != g_start)
-				{
-					g_current_scene->kill();
-				}
 
             case SDLK_p:
 				// Pause the game
@@ -292,13 +296,17 @@ void process_input()
             }
 
 
-            //bonus options
+            //quickly moves to the next scenes
+            if (key_state[SDL_SCANCODE_K])
+            {
+                // Instant win
+                if (g_current_scene != g_start)
+                {
+                    g_current_scene->kill();
+                }
+            }
 
-
-
-
-
-
+            //normalize movement
             if (glm::length(g_current_scene->get_state().player->get_movement()) > 5.0f)
             {
                 g_current_scene->get_state().player->normalise_movement();
@@ -365,12 +373,12 @@ void update()
 		g_current_scene->update(delta_time);
 	}
 
-    //updates while the game is on
+    //updates while the scene is on
     if (g_current_scene->level_on)
     {
 
 
-        //updating game
+        //game stuff
         if (g_current_scene != g_start )
         {
 
@@ -387,6 +395,9 @@ void update()
 				win_sound = false;
             }
 
+
+
+            //updating game
             delta_time += g_accumulator;
 
             if (delta_time < FIXED_TIMESTEP)
@@ -395,7 +406,7 @@ void update()
                 return;
             }
 
-            //grabs the scaled up position of the mouse
+            //grabs a scaled up position of the mouse
             int x, y;
 
             SDL_GetMouseState(&x, &y);
@@ -424,14 +435,14 @@ void update()
                 }
 
 				//level clear logic
-                if (g_current_scene == g_level_a && g_current_scene->clear)
+                if (g_current_scene == g_level_a && g_level_a->clear)
                 {
                     
                     g_level_b = new LevelB();
                     switch_to_scene(g_level_b);
                 }
 
-                if (g_current_scene == g_level_b && g_current_scene->clear)
+                if (g_current_scene == g_level_b && g_level_b->clear)
                 {
                     
                     g_level_c = new LevelC();
@@ -463,6 +474,8 @@ void update()
             // ————— PLAYER CAMERA ————— //
             g_view_matrix = glm::mat4(1.0f);
             g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-g_current_scene->get_state().player->get_position().x, -g_current_scene->get_state().player->get_position().y, 0));
+
+			std::cout << g_current_scene->get_state().player->get_position().x << " " << g_current_scene->get_state().player->get_position().y << std::endl;
         }
     }
 
@@ -478,18 +491,33 @@ void update()
 
 void render()
 {
-    g_shader_program.set_view_matrix(g_view_matrix);
+    //renders menu shaders and scene
+    if (g_current_scene == g_start)
+    {
 
-    glClear(GL_COLOR_BUFFER_BIT);
-    g_current_scene->render(&g_shader_program);
+        menu_shader_program.set_view_matrix(g_view_matrix);
 
-    //renders the scene when the game is playing
+        glClear(GL_COLOR_BUFFER_BIT);
+        glUseProgram(menu_shader_program.get_program_id());
+        g_current_scene->render(&menu_shader_program);
+    }
+
+    //renders game shaders and scenes
     if (g_current_scene != g_start)
     {
-		//box will be rendered first on levelup so everything else will be on top of it
+
+
+        g_shader_program.set_view_matrix(g_view_matrix);
+
+        glClear(GL_COLOR_BUFFER_BIT);
+        glUseProgram(g_shader_program.get_program_id());
+        g_current_scene->render(&g_shader_program);
+
+        //renders the scene when the game is playing
+            //box will be rendered first on levelup so everything else will be on top of it
         if (g_current_scene->levelup)
         {
-			box->render(&g_shader_program);
+            box->render(&g_shader_program);
         }
 
         //renders very basic UI
@@ -503,8 +531,8 @@ void render()
         std::string kills = "Kills: ";
         kills += std::to_string(g_current_scene->get_state().player->get_kills());
 
-		std::string exp = "Level: ";
-		exp += std::to_string(level);
+        std::string exp = "Level: ";
+        exp += std::to_string(level);
         exp += "  EXP: ";
         exp += std::to_string(g_current_scene->get_state().player->get_current_exp());
         exp += "/";
@@ -529,14 +557,13 @@ void render()
         //renders a win message when the final stage is cleared
         if (g_current_scene == g_level_c && g_current_scene->win)
         {
-            g_current_scene->turn_off();
             Utility::draw_text(&g_shader_program, text_texture_id, "You WIN!!!!!!!",
                 .75, .01, glm::vec3(g_current_scene->get_state().player->get_position().x - 3, g_current_scene->get_state().player->get_position().y + 1, 0.0f));
         }
 
         //displays basic levelup ui
         if (g_current_scene->levelup)
-		{
+        {
             Utility::draw_text(&g_shader_program, text_texture_id, "LEVEL UP",
                 .75, .01, glm::vec3(g_current_scene->get_state().player->get_position().x - 2.75, g_current_scene->get_state().player->get_position().y + 3, 0.0f));
             Utility::draw_text(&g_shader_program, text_texture_id, "1: Health Boost",
@@ -551,11 +578,11 @@ void render()
                 .45, .01, glm::vec3(g_current_scene->get_state().player->get_position().x - 7, g_current_scene->get_state().player->get_position().y - 2.5, 0.0f));
             Utility::draw_text(&g_shader_program, text_texture_id, "6: Firerate Boost",
                 .45, .01, glm::vec3(g_current_scene->get_state().player->get_position().x + 1, g_current_scene->get_state().player->get_position().y - 2.5, 0.0f));
-		}
+        }
 
 
         //renders a lose message when the players health reaches 0
-        if (g_current_scene->get_state().player->get_paused())
+        if (g_current_scene->get_state().player->get_paused() && !g_current_scene->win && !g_current_scene->levelup)
         {
             Utility::draw_text(&g_shader_program, text_texture_id, "PAUSED",
                 .75, .01, glm::vec3(g_current_scene->get_state().player->get_position().x - 2, g_current_scene->get_state().player->get_position().y + 1, 0.0f));
@@ -565,7 +592,7 @@ void render()
 }
 void level_clear()
 {
-    //saves stats for the next level from the previous
+    //saves stats for the next scene from the previous
     if (g_current_scene == g_level_b)
     {
         g_level_b->max_health = g_level_a->get_state().player->get_max_health();

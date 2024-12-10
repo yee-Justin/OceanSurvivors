@@ -26,6 +26,7 @@ float LevelC_timer = 0.0f;
 float boss_timer = 0.0f;
 
 bool boss_time = false;
+bool boss_music = false;
 
 unsigned int LEVEL_C_DATA[] =
 {
@@ -139,28 +140,50 @@ void LevelC::initialise()
     m_game_state.bubble->set_timer(m_game_state.bubble->get_rate());
     m_game_state.bubble->set_projectile_time(m_game_state.player->get_projectile_time());
 
+
+    //generates either a clam or a shrimp at random positions
     int random_pos;
+    int random_enemy;
     for (int i = 0; i < m_number_of_enemies; i++)
     {
         random_pos = rand() % 76; //picks a random position for the enemy to spawn
+        random_enemy = rand() % 2; //picks a random enemy to spawn
 
-        m_game_state.enemies.push_back(new Entity(clam_texture_id, 1.0f, 10.0f, 10.0f, 2.0f, 0.5f, 0.5f, ENEMY, CLAM, WALKING));
-        m_game_state.enemies[i]->set_position(enemy_positions[random_pos]);
-        m_game_state.enemies[i]->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
-        m_game_state.enemies[i]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
-        m_game_state.enemies[i]->set_exp(50);
+        if (random_enemy == 0)
+        {
+            m_game_state.enemies.push_back(new Entity(shrimp_texture_id, 1.0f, 10.0f, 25.0f, 0.0f, 0.25f, 0.25f, ENEMY, FOLLOWER, IDLE));
+            m_game_state.enemies[i]->set_position(enemy_positions[random_pos]);
+            m_game_state.enemies[i]->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
+            m_game_state.enemies[i]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
+            m_game_state.enemies[i]->set_exp(50);
 
-        m_game_state.enemies[i]->set_animation_cols(8);
-        m_game_state.enemies[i]->set_animation_rows(1);
-        m_game_state.enemies[i]->set_animation_frames(4);
-        m_game_state.enemies[i]->set_animation_index(0);
-        m_game_state.enemies[i]->set_animation_time(0.0f);
-        m_game_state.enemies[i]->set_walking(walking_animation);
+            m_game_state.enemies[i]->set_animation_cols(8);
+            m_game_state.enemies[i]->set_animation_rows(1);
+            m_game_state.enemies[i]->set_animation_frames(4);
+            m_game_state.enemies[i]->set_animation_index(0);
+            m_game_state.enemies[i]->set_animation_time(0.0f);
+            m_game_state.enemies[i]->set_walking(walking_animation);
+        }
+        if (random_enemy == 1)
+        {
+            m_game_state.enemies.push_back(new Entity(clam_texture_id, 1.0f, 10.0f, 10.0f, 2.0f, 0.5f, 0.5f, ENEMY, CLAM, WALKING));
+            m_game_state.enemies[i]->set_position(enemy_positions[random_pos]);
+            m_game_state.enemies[i]->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
+            m_game_state.enemies[i]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
+            m_game_state.enemies[i]->set_exp(50);
 
-        m_game_state.enemies[i]->set_rate(2.5f);
-        m_game_state.enemies[i]->set_timer(2.0f);
-        m_game_state.enemies[i]->set_projectile_time(2.0f);
-        m_game_state.enemies[i]->set_pierce(5.0f);
+            m_game_state.enemies[i]->set_animation_cols(8);
+            m_game_state.enemies[i]->set_animation_rows(1);
+            m_game_state.enemies[i]->set_animation_frames(4);
+            m_game_state.enemies[i]->set_animation_index(0);
+            m_game_state.enemies[i]->set_animation_time(0.0f);
+            m_game_state.enemies[i]->set_walking(walking_animation);
+
+            m_game_state.enemies[i]->set_rate(2.5f);
+            m_game_state.enemies[i]->set_timer(2.0f);
+            m_game_state.enemies[i]->set_projectile_time(2.0f);
+            m_game_state.enemies[i]->set_pierce(5.0f);
+        }
 
         m_game_state.projectiles.push_back(new Entity(clamprojectile_id, 5.0f, 1.0, m_game_state.enemies[i]->get_damage(), 0.0f, 0.5f, 0.5f, PROJECTILE, ENEMY_PROJECTILE, IDLE));
         m_game_state.projectiles[i]->deactivate();
@@ -171,18 +194,11 @@ void LevelC::initialise()
         enemy_attack_rate = m_game_state.enemies[i]->get_rate();
         m_game_state.projectiles[i]->set_timer(m_game_state.enemies[i]->get_timer());
         m_game_state.projectiles[i]->set_projectile_time(m_game_state.enemies[i]->get_projectile_time());
+
     }
 
-    m_game_state.bubble = new Entity(bubble_texture_id, m_game_state.player->get_projectile_speed(), m_game_state.player->get_pierce(), m_game_state.player->get_damage(), 0.0f, 0.5f, 0.4f, PROJECTILE, BUBBLE, IDLE);
-    m_game_state.bubble->set_position(m_game_state.player->get_position());
-    m_game_state.bubble->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
-    m_game_state.bubble->set_scale(glm::vec3(.50f, .4f, 1.0f));
-    m_game_state.bubble->set_rate(m_game_state.player->get_rate());
-    attack_rate = m_game_state.bubble->get_rate();
-    m_game_state.bubble->set_timer(m_game_state.bubble->get_rate());
-    m_game_state.bubble->set_projectile_time(m_game_state.player->get_projectile_time());
-
-    m_game_state.boss = new Entity(boss_texture_id, 3.0f, 1000.0f, 20.0f, 2.0f, 3.0f, 2.0f, ENEMY, FOLLOWER, IDLE);
+    //initializes boss rather far away
+    m_game_state.boss = new Entity(boss_texture_id, 4.0f, 10.0f, 20.0f, 2.0f, 3.0f, 2.0f, ENEMY, PAUSED, IDLE);
     m_game_state.boss->set_position(glm::vec3(-20.0f, -10.0f, 0.0f));
     m_game_state.boss->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
     m_game_state.boss->set_scale(glm::vec3(7.0f, 7.0f, 1.0f));
@@ -197,6 +213,8 @@ void LevelC::initialise()
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 
     m_game_state.bgm = Mix_LoadMUS(BGM_FILEPATH);
+	m_game_state.boss_bgm = Mix_LoadMUS(BOSSBGM_FILEPATH);
+
     Mix_VolumeMusic(MIX_MAX_VOLUME / 4.0f);
     Mix_PlayMusic(m_game_state.bgm, -1);
 
@@ -217,12 +235,30 @@ void LevelC::update(float delta_time)
     }
     else
     {
+		//if the boss dies, stop the music and pause the game
         if (!m_game_state.boss->get_is_active())
         {
             win = true;
-            Mix_HaltChannel(-1);
-            turn_off();
+			Mix_HaltMusic();
+            for (int i = 0; i < m_number_of_enemies; i++)
+            {
+                m_game_state.enemies[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
+                m_game_state.enemies[i]->set_ai_type(PAUSED);
+                m_game_state.enemies[i]->pause();
+                m_game_state.projectiles[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
+                m_game_state.projectiles[i]->set_ai_type(PAUSED);
+                m_game_state.projectiles[i]->pause();
+            }
+
+            m_game_state.player->set_entity_type(PLATFORM);
+            m_game_state.player->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
+            m_game_state.player->pause();
+            m_game_state.bubble->set_ai_type(PAUSED);
+            m_game_state.bubble->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
+            m_game_state.bubble->pause();
         }
+
+        //increments player kills/exp based on bubble kills/exp and sets bubble kills/exp to 0
         m_game_state.player->add_kills(m_game_state.bubble->get_kills());
         m_game_state.bubble->set_kills(0);
         m_game_state.player->add_exp(m_game_state.bubble->get_current_exp());
@@ -231,7 +267,8 @@ void LevelC::update(float delta_time)
         LevelC_timer += delta_time;
         boss_timer += delta_time;
 
-        if (LevelC_timer >= 10000.0f)
+        //allows more enemies to spawn every second
+        if (LevelC_timer >= 1.0f)
         {
             if (LevelC_current_enemies < m_number_of_enemies)
             {
@@ -240,9 +277,14 @@ void LevelC::update(float delta_time)
             LevelC_timer = 0.0f;
         }
 
-        if (boss_timer >= 0.0f)
+        //spawns the boss after 30 seconds and plays boss music
+        if (boss_timer >= 30.0f && !boss_music)
         {
             boss_time = true;
+			m_game_state.boss->set_ai_type(FOLLOWER);
+            Mix_HaltMusic();
+            Mix_PlayMusic(m_game_state.boss_bgm, -1);
+			boss_music = true;
         }
 
         attack_rate -= delta_time;
@@ -253,8 +295,11 @@ void LevelC::update(float delta_time)
             m_game_state.player->update(delta_time, m_game_state.player, NULL, 0,
                 m_game_state.map);
 
+
+            //bubble logic
             if (attack_rate <= 0.0f)
             {
+                //shoots at intervals and resets if running out of pierce, of projectile time, or collision with map wall
                 if (!m_game_state.bubble->get_is_active())
                 {
                     m_game_state.bubble->set_position(m_game_state.player->get_position());
@@ -280,14 +325,18 @@ void LevelC::update(float delta_time)
                 }
             }
 
+
+            //enemy projectile logic, only clams shoot
             if (enemy_attack_rate <= 0.0f)
             {
+                //shoot at the last known position of the player at set intervals
                 player_position = m_game_state.player->get_position();
                 for (int i = 0; i < LevelC_current_enemies; i++)
                 {
+                    //only shoots if the clam is alive
                     if (m_game_state.enemies[i]->get_is_active())
                     {
-                        if (m_game_state.enemies[i]->get_ai_state() == IDLE && !m_game_state.projectiles[i]->get_is_active())
+                        if (m_game_state.enemies[i]->get_ai_state() == CLAM && m_game_state.enemies[i]->get_ai_state() == IDLE && !m_game_state.projectiles[i]->get_is_active())
                         {
                             m_game_state.projectiles[i]->set_position(m_game_state.enemies[i]->get_position());
                             m_game_state.projectiles[i]->set_health(m_game_state.enemies[i]->get_pierce());
@@ -296,6 +345,8 @@ void LevelC::update(float delta_time)
                             m_game_state.projectiles[i]->set_timer(m_game_state.enemies[i]->get_timer());
                             m_game_state.projectiles[i]->set_speed(m_game_state.enemies[i]->get_projectile_speed());
                             m_game_state.projectiles[i]->activate();
+                            
+                            //resets player projectile collision so they can take damage again
                             if (m_game_state.player->get_collided_projectile())
                             {
                                 m_game_state.player->change_projectile();
@@ -303,15 +354,18 @@ void LevelC::update(float delta_time)
                         }
                     }
                 }
+                //resets enemy attack timer
                 enemy_attack_rate = m_game_state.enemies[0]->get_rate();
             }
 
 
-
+            //updates bubble
             m_game_state.bubble->ai_bubble(mouse_position);
             m_game_state.bubble->update(delta_time, m_game_state.player, NULL, 0,
                 m_game_state.map);
 
+
+            //checks for collision from the player and bubble side
             for (int i = 0; i < LevelC_current_enemies; i++)
             {
                 m_game_state.player->check_collision_x(m_game_state.enemies[i], 1);
@@ -333,7 +387,7 @@ void LevelC::update(float delta_time)
         }
 
 
-
+        //moves enemies and projectiles
         m_game_state.boss->update(delta_time, m_game_state.player, NULL, 0, m_game_state.map);
         for (int i = 0; i < LevelC_current_enemies; i++)
         {
@@ -391,19 +445,19 @@ void LevelC::render(ShaderProgram* g_shader_program)
 
 }
 
+//kills the boss to instant win
 void LevelC::kill()
 {
-    win = true;
+    m_game_state.boss->deactivate();
 }
 
+//sets all enemies to their normal state
 void LevelC::turn_on()
 {
 
-    level_on = true;
     for (int i = 0; i < m_number_of_enemies; i++)
     {
         m_game_state.enemies[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
-        m_game_state.enemies[i]->set_ai_type(CLAM);
         m_game_state.enemies[i]->unpause();
         m_game_state.projectiles[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
         m_game_state.projectiles[i]->set_ai_type(ENEMY_PROJECTILE);
@@ -416,9 +470,19 @@ void LevelC::turn_on()
     m_game_state.bubble->set_ai_type(BUBBLE);
     m_game_state.bubble->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
     m_game_state.bubble->unpause();
+	m_game_state.boss->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
 
+    //if the boss has not "spawned" yet, do not make it move
+    if (boss_time)
+    {
+        m_game_state.boss->set_ai_type(FOLLOWER);
+    }
+    m_game_state.boss->unpause();
 
+    level_on = true;
 }
+
+//sets everything to not move
 void LevelC::turn_off()
 {
 
@@ -426,7 +490,6 @@ void LevelC::turn_off()
     for (int i = 0; i < m_number_of_enemies; i++)
     {
         m_game_state.enemies[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
-        m_game_state.enemies[i]->set_ai_type(PAUSED);
         m_game_state.enemies[i]->pause();
         m_game_state.projectiles[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
         m_game_state.projectiles[i]->set_ai_type(PAUSED);
@@ -439,6 +502,10 @@ void LevelC::turn_off()
     m_game_state.bubble->set_ai_type(PAUSED);
     m_game_state.bubble->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
     m_game_state.bubble->pause();
+	m_game_state.boss->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
+	m_game_state.boss->set_ai_type(PAUSED);
+	m_game_state.boss->pause();
+
 }
 
 void LevelC::level_clear()

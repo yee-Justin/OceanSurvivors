@@ -1,17 +1,12 @@
 ﻿#include "LevelA.h"
 #include "Utility.h"
 
-
-
 constexpr char 
-
 //I made these
 SPRITESHEET_FILEPATH[] = "assets/whale.png", 
 SHRIMP_FILEPATH[] = "assets/shrimp.png",
 BUBBLE_FILEPATH[] = "assets/bubble.png",
 CLAM_FILEPATH[] = "assets/clam.png",
-
-
 
 MAP_TILESET_FILEPATH[] = "assets/map.png", //From https://opengameart.org/content/tile-map-dark-2d-platformer
 
@@ -143,8 +138,6 @@ void LevelA::initialise()
 	m_game_state.bubble_sfx = Mix_LoadWAV(BUBBLE_SFX_FILEPATH);
     Mix_VolumeChunk(m_game_state.bubble_sfx, MIX_MAX_VOLUME / 2.0f);
 
-    turn_off();
-    
 }
 
 void LevelA::update(float delta_time)
@@ -261,7 +254,7 @@ void LevelA::kill()
 void LevelA::turn_on()
 {
     
-    level_on = true;
+
     for (int i = 0; i < m_number_of_enemies; i++)
     {
         m_game_state.enemies[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -275,6 +268,7 @@ void LevelA::turn_on()
 	m_game_state.bubble->set_ai_type(BUBBLE);
     m_game_state.bubble->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
 	m_game_state.bubble->unpause();
+    level_on = true;
     
 
 }
