@@ -22,6 +22,10 @@ void Entity::ai_activate(Entity* entities)
     case PAUSED:
         ai_paused(entities);
         break;
+
+	case CLAM:
+		ai_clam(entities);
+		break;
     default:
         break;
     }
@@ -32,7 +36,7 @@ void Entity::ai_follower(Entity* entities)
     switch (m_ai_state) {
     case IDLE:
 		m_movement = glm::vec3(0.0f, 0.0f, 0.0f);
-        if (glm::distance(m_position, entities->get_position()) < 1000.0f) m_ai_state = WALKING;
+        if (glm::distance(m_position, entities->get_position()) < 1000.0f) { m_ai_state = WALKING; }
         break;
 
     case WALKING:
@@ -56,13 +60,55 @@ void Entity::ai_follower(Entity* entities)
             m_movement.y = 0.50f;
 		}
 
-
-        if (glm::distance(m_position, entities->get_position()) > 16.0f) m_ai_state = IDLE;
         break;
 
     default:
         break;
     }
+}
+
+void Entity::ai_clam(Entity* entities)
+{
+
+    if (glm::distance(m_position, entities->get_position()) > 6.0f)
+    {
+        if (m_position.x > entities->get_position().x)
+        {
+            m_movement.x = -0.75f;
+            face_left();
+        }
+        else if (m_position.x < entities->get_position().x)
+        {
+            m_movement.x = 0.75f;
+            face_right();
+        }
+
+        if (m_position.y > entities->get_position().y)
+        {
+            m_movement.y = -0.75f;
+        }
+        else if (m_position.y < entities->get_position().y)
+        {
+            m_movement.y = 0.75f;
+        }
+
+		m_ai_state = WALKING;
+    }
+    else
+    {
+        m_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+        if (m_position.x > entities->get_position().x)
+        {
+            face_left();
+        }
+        else if (m_position.x < entities->get_position().x)
+        {
+            face_right();
+        }
+
+		m_ai_state = IDLE;
+    }
+
 }
 
 void Entity::ai_paused(Entity* entities)
@@ -73,17 +119,31 @@ void Entity::ai_paused(Entity* entities)
 
 void Entity::ai_bubble(glm::vec3 cursor_pos)
 {
-        // Calculate the direction vector towards the cursor position
-        glm::vec3 direction = cursor_pos - m_position;
+    // Calculate the direction vector towards the cursor position
+    glm::vec3 direction = cursor_pos - m_position;
 
-        // Normalize the direction vector to get consistent speed
-        direction = glm::normalize(direction);
-        
+    // Normalize the direction vector to get consistent speed
+    direction = glm::normalize(direction);
 
-        // Scale the direction vector by the desired movement speed
-        m_movement = direction * m_speed;
+
+    // Scale the direction vector by the desired movement speed
+    m_movement = direction * m_speed;
 }
 
+
+void Entity::ai_enemy_projectile(glm::vec3 player_pos)
+{
+    // Calculate the direction vector towards the cursor position
+    glm::vec3 direction = player_pos - m_position;
+
+    // Normalize the direction vector to get consistent speed
+    direction = glm::normalize(direction);
+
+
+    // Scale the direction vector by the desired movement speed
+    m_movement = direction * m_speed;
+
+}
 
 void Entity::levelup(int choice)
 {
@@ -250,7 +310,9 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
                         if (collidable_entity->get_health() <= 0.0f)
                         {
                             collidable_entity->deactivate();
+
                             m_enemies_killed += 1;
+
                             exp += collidable_entity->get_exp();
                         }
                     }
@@ -267,20 +329,36 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
                         }
                     }
                 }
-
-                if (collidable_entity->get_health() <= 0.0f)
-                {
-                    collidable_entity->deactivate();
-                }
-
-                if (m_current_health <= 0.0f)
-                {
-                    m_is_active = false;
-                    reset_projectile();
-                    return;
-                }
-
             }
+
+            if (collidable_entity->get_ai_type() == ENEMY_PROJECTILE)
+            {
+
+                if (m_entity_type == PLAYER && can_take_damage)
+                {
+                    collidable_entity->take_damage(100);
+                    m_current_health -= collidable_entity->get_damage();
+                    can_take_damage = false;
+                }
+                else
+                {
+                    collidable_entity->take_damage(m_damage);
+                    m_current_health -= collidable_entity->get_damage();
+                }
+            }
+
+            if (collidable_entity->get_health() <= 0.0f)
+            {
+                collidable_entity->deactivate();
+            }
+
+            if (m_current_health <= 0.0f)
+            {
+                m_is_active = false;
+                reset_projectile();
+                return;
+            }
+
 
             if (m_velocity.y > 0 && m_entity_type != PROJECTILE)
             {
@@ -345,11 +423,14 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
                         if (collidable_entity->get_health() <= 0.0f)
                         {
                             collidable_entity->deactivate();
+
                             m_enemies_killed += 1;
-							exp += collidable_entity->get_exp();
+
+                            exp += collidable_entity->get_exp();
                         }
                     }
                 }
+
                 else
                 {
                     if (m_entity_type == PLAYER)
@@ -361,18 +442,28 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
                         }
                     }
                 }
+            }
 
+            if (collidable_entity->get_ai_type() == ENEMY_PROJECTILE)
+            {
+                if (can_take_damage)
+                {
+                    collidable_entity->take_damage(100);
+                    m_current_health -= collidable_entity->get_damage();
+					can_take_damage = false;
+                }
+            }
 
-                if (collidable_entity->get_health() <= 0.0f)
-                {
-                    collidable_entity->deactivate();
-                }
-                if (m_current_health <= 0.0f)
-                {
-                    m_is_active = false;
-                    reset_projectile();
-                    return;
-                }
+            if (collidable_entity->get_health() <= 0.0f)
+            {
+                collidable_entity->deactivate();
+            }
+
+            if (m_current_health <= 0.0f)
+            {
+                m_is_active = false;
+                reset_projectile();
+                return;
             }
 
             float x_distance = fabs(m_position.x - collidable_entity->m_position.x);
@@ -513,7 +604,7 @@ void Entity::update(float delta_time, Entity* player, Entity* collidable_entitie
 
         if (m_entity_type == ENEMY && player != NULL) ai_activate(player);
 
-        if (m_entity_type == PROJECTILE)
+        if (m_entity_type == PROJECTILE || m_ai_type == ENEMY_PROJECTILE)
         {
             m_projectile_time -= delta_time;
             if (m_projectile_time <= 0.0f)
@@ -558,7 +649,7 @@ void Entity::update(float delta_time, Entity* player, Entity* collidable_entitie
 
 
         //non_enemies can pass through objects
-        if (m_ai_type != FOLLOWER)
+        if (m_ai_type != FOLLOWER && m_ai_type != CLAM && m_ai_type != ENEMY_PROJECTILE)
         {
 
             m_velocity.x = m_movement.x * m_speed;

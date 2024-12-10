@@ -37,8 +37,6 @@ struct GameState
     Mix_Music* bgm;
     Mix_Music* boss_bgm;
 
-	Mix_Chunk* lose_sfx;
-	Mix_Chunk* win_sfx;
 	Mix_Chunk* bubble_sfx;
 };
 

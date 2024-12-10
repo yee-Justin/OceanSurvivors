@@ -6,7 +6,7 @@
 #include "glm/glm.hpp"
 #include "ShaderProgram.h"
 enum EntityType { PLATFORM, PLAYER, ENEMY, HEALTH, PROJECTILE, OBJECT};
-enum AIType { PAUSED, FOLLOWER, BUBBLE, ENEMY_PROJECTILE };
+enum AIType { PAUSED, FOLLOWER, CLAM, BUBBLE, ENEMY_PROJECTILE };
 enum AIState { WALKING, IDLE };
 
 
@@ -103,8 +103,10 @@ public:
 
     void ai_activate(Entity* entities);
     void ai_follower(Entity* entities);
+    void ai_clam(Entity* entities);
     void ai_paused(Entity* entities);
     void ai_bubble(glm::vec3 cursor_pos);
+    void ai_enemy_projectile(glm::vec3 player_pos);
 
 	void levelup(int choice);
     
@@ -176,6 +178,7 @@ public:
     bool      const get_collided_right() const { return m_collided_right; }
     bool      const get_collided_left() const { return m_collided_left; }
 	bool      const get_collided_projectile() const { return m_collided_projectile; }
+	bool      const get_paused() const { return paused; }
 
     void activate() { m_is_active = true; };
     void deactivate() { m_is_active = false; };

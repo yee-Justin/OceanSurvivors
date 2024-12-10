@@ -51,12 +51,21 @@ VIEWPORT_HEIGHT = WINDOW_HEIGHT;
 constexpr char GAME_WINDOW_NAME[] = "FORM!";
 
 constexpr char HEALTH_FILEPATH[] = "assets/health.png", //From https://adwitr.itch.io/pixel-health-bar-asset-pack-2 (edited for color)
-BOX_FILEPATH[] = "assets/bluebox.png",
-TEXT_FILEPATH[] = "assets/font1.png";
+BOX_FILEPATH[] = "assets/bluebox.png", //just a blue box made in paint
+TEXT_FILEPATH[] = "assets/font1.png",
+WIN_SFX_FILEPATH[] = "assets/win.wav", // From https://opengameart.org/content/win-music-3
+LOSE_SFX_FILEPATH[] = "assets/lose.wav"; // From https://opengameart.org/content/game-over-trumpet-sfx
+
 GLuint text_texture_id;
 
 Entity* health;
 Entity* box;
+
+Mix_Chunk* win_sfx;
+Mix_Chunk* lose_sfx;
+
+bool win_sound = true;
+bool lose_sound = true;
 
 int level = 1;
 int levelup_requirement = 10;
@@ -176,6 +185,11 @@ void initialise()
     health = new Entity(health_texture_id, 0.0f, 1, 1, HEALTH);
     box = new Entity(box_texture_id, 0.0f, 1, 1, OBJECT);
 
+
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+    win_sfx = Mix_LoadWAV(WIN_SFX_FILEPATH);
+    lose_sfx = Mix_LoadWAV(LOSE_SFX_FILEPATH);
+
     // ————— BLENDING ————— //
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -203,6 +217,44 @@ void process_input()
                 // Quit the game with a keystroke
                 g_app_status = TERMINATED;
                 break;
+			case SDLK_RETURN:
+				// Start the game with a keystroke
+				if (g_current_scene == g_start)
+				{
+					g_level_a = new LevelA();
+					switch_to_scene(g_level_a);
+				}
+				break;
+
+            case SDLK_k:
+				// Instant win
+				if (g_current_scene != g_start)
+				{
+					g_current_scene->kill();
+				}
+
+            case SDLK_p:
+				// Pause the game
+				if (g_current_scene != g_start)
+				{
+					g_current_scene->turn_off();
+				}
+				break;
+				
+            case SDLK_SPACE:
+				// Unpause the game
+                if (g_current_scene != g_start && !g_current_scene->level_on && !g_current_scene->levelup)
+                {
+                    g_current_scene->turn_on();
+                }
+                break;
+            case SDLK_l:
+				// Level up
+				if (g_current_scene != g_start)
+				{
+                    g_current_scene->get_state().player->add_exp(levelup_requirement);
+				}
+				break;
 
             default:
                 break;
@@ -215,112 +267,85 @@ void process_input()
 
     const Uint8* key_state = SDL_GetKeyboardState(NULL);
 
-    //start screen options
-    if (g_current_scene == g_start)
+
+    if (!g_current_scene->win)
     {
-        if (key_state[SDL_SCANCODE_RETURN])
+        //when the game is playing
+        if (g_current_scene != g_start && g_current_scene->level_on)
         {
-            g_level_a = new LevelA();
-            switch_to_scene(g_level_a);
-        }
-    }
-
-    //when the game is playing
-    if (g_current_scene != g_start && g_current_scene->level_on)
-    {
-        //move left right up down
-        if (key_state[SDL_SCANCODE_A])
-        {
-            g_current_scene->get_state().player->move_left();
-        }
-        if (key_state[SDL_SCANCODE_D])
-        {
-            g_current_scene->get_state().player->move_right();
-        }
-        if (key_state[SDL_SCANCODE_W])
-        {
-            g_current_scene->get_state().player->move_up();
-        }
-        if (key_state[SDL_SCANCODE_S])
-        {
-            g_current_scene->get_state().player->move_down();
-        }
+            //move left right up down
+            if (key_state[SDL_SCANCODE_A])
+            {
+                g_current_scene->get_state().player->move_left();
+            }
+            if (key_state[SDL_SCANCODE_D])
+            {
+                g_current_scene->get_state().player->move_right();
+            }
+            if (key_state[SDL_SCANCODE_W])
+            {
+                g_current_scene->get_state().player->move_up();
+            }
+            if (key_state[SDL_SCANCODE_S])
+            {
+                g_current_scene->get_state().player->move_down();
+            }
 
 
-        //bonus options
-        //Instant wins the stage
-        if (key_state[SDL_SCANCODE_K])
-        {
-            g_current_scene->kill();
-        }
+            //bonus options
 
-        //levels up instantly
-        if (key_state[SDL_SCANCODE_L])
-        {
-            g_current_scene->get_state().player->add_exp(levelup_requirement);
-        }
 
-        //pauses the game
-        if (key_state[SDL_SCANCODE_P])
-        {
-            g_current_scene->turn_off();
+
+
+
+
+            if (glm::length(g_current_scene->get_state().player->get_movement()) > 5.0f)
+            {
+                g_current_scene->get_state().player->normalise_movement();
+            }
         }
 
 
 
-        if (glm::length(g_current_scene->get_state().player->get_movement()) > 5.0f)
+        //level up options
+        if (g_current_scene->levelup)
         {
-            g_current_scene->get_state().player->normalise_movement();
-        }
-    }
-
-    else
-    {
-        //unpauses if the game is paused
-        if (!g_current_scene->levelup && key_state[SDL_SCANCODE_SPACE])
-        {
-            g_current_scene->turn_on();
-        }
-    }
-
-	//level up options
-    if (g_current_scene->levelup)
-    {
-        if (key_state[SDL_SCANCODE_1])
-        {
-            g_current_scene->get_state().player->levelup(1);
-            g_current_scene->levelup = false;
-            g_current_scene->turn_on();
-        }
-        if (key_state[SDL_SCANCODE_2])
-        {
-            g_current_scene->get_state().player->levelup(2);
-            g_current_scene->levelup = false;
-            g_current_scene->turn_on();
-        }
-        if (key_state[SDL_SCANCODE_3])
-        {
-            g_current_scene->get_state().player->levelup(3);
-            g_current_scene->levelup = false;
-            g_current_scene->turn_on();
-        }
-        if (key_state[SDL_SCANCODE_4])
-        {
-            g_current_scene->get_state().player->levelup(4);
-            g_current_scene->levelup = false;
-            g_current_scene->turn_on();
-        }
-        if (key_state[SDL_SCANCODE_5])
-        {
-            g_current_scene->get_state().player->levelup(5);
-            g_current_scene->levelup = false;
-            g_current_scene->turn_on();
-        }
-        if (key_state[SDL_SCANCODE_6])
-        {
-            g_current_scene->get_state().player->levelup(6);
-            g_current_scene->levelup = false;
-            g_current_scene->turn_on();
+            if (key_state[SDL_SCANCODE_1])
+            {
+                g_current_scene->get_state().player->levelup(1);
+                g_current_scene->levelup = false;
+                g_current_scene->turn_on();
+            }
+            if (key_state[SDL_SCANCODE_2])
+            {
+                g_current_scene->get_state().player->levelup(2);
+                g_current_scene->levelup = false;
+                g_current_scene->turn_on();
+            }
+            if (key_state[SDL_SCANCODE_3])
+            {
+                g_current_scene->get_state().player->levelup(3);
+                g_current_scene->levelup = false;
+                g_current_scene->turn_on();
+            }
+            if (key_state[SDL_SCANCODE_4])
+            {
+                g_current_scene->get_state().player->levelup(4);
+                g_current_scene->levelup = false;
+                g_current_scene->turn_on();
+            }
+            if (key_state[SDL_SCANCODE_5])
+            {
+                g_current_scene->get_state().player->levelup(5);
+                g_current_scene->levelup = false;
+                g_current_scene->turn_on();
+            }
+            if (key_state[SDL_SCANCODE_6])
+            {
+                g_current_scene->get_state().player->levelup(6);
+                g_current_scene->levelup = false;
+                g_current_scene->turn_on();
+            }
         }
     }
 }
@@ -343,8 +368,25 @@ void update()
     //updates while the game is on
     if (g_current_scene->level_on)
     {
-        if (g_current_scene != g_start)
+
+
+        //updating game
+        if (g_current_scene != g_start )
         {
+
+            // lose win sound effects
+            if (g_current_scene->get_state().player->get_health() <= 0.0f && lose_sound)
+            {
+                Mix_PlayChannel(-1, lose_sfx, 0);
+                lose_sound = false;
+            }
+
+            if (g_current_scene == g_level_c && g_current_scene->win && win_sound)
+            {
+                Mix_PlayChannel(-1, win_sfx, 0);
+				win_sound = false;
+            }
+
             delta_time += g_accumulator;
 
             if (delta_time < FIXED_TIMESTEP)
@@ -353,6 +395,7 @@ void update()
                 return;
             }
 
+            //grabs the scaled up position of the mouse
             int x, y;
 
             SDL_GetMouseState(&x, &y);
@@ -361,12 +404,14 @@ void update()
             {
                 g_current_scene->mouse_position = glm::vec3(5 * get_screen_to_ortho(x, X_COORDINATE), 5 * get_screen_to_ortho(y, Y_COORDINATE), 0.0f);
             }
+
+			// ————— FIXED TIMESTEP LOOP ————— //
             while (delta_time >= FIXED_TIMESTEP)
             {
                 // ————— UPDATING THE SCENE (i.e. map, character, enemies...) ————— //
                 g_current_scene->update(FIXED_TIMESTEP);
 
-
+                //levelup logic
                 if (g_current_scene->get_state().player->get_current_exp() >= levelup_requirement)
                 {
                     levelup_requirement *= 1.25;
@@ -378,6 +423,7 @@ void update()
                     g_current_scene->turn_off();
                 }
 
+				//level clear logic
                 if (g_current_scene == g_level_a && g_current_scene->clear)
                 {
                     
@@ -385,7 +431,7 @@ void update()
                     switch_to_scene(g_level_b);
                 }
 
-                if (g_current_scene == g_level_b && g_current_scene->win)
+                if (g_current_scene == g_level_b && g_current_scene->clear)
                 {
                     
                     g_level_c = new LevelC();
@@ -397,6 +443,7 @@ void update()
 
             g_accumulator = delta_time;
 
+            //setting health bar
             health->set_position(glm::vec3(g_current_scene->get_state().player->get_position().x - 10, g_current_scene->get_state().player->get_position().y + 5.4, 0));
             if (g_current_scene->get_state().player->get_health() > 0)
             {
@@ -408,6 +455,7 @@ void update()
             }
             health->update(0, NULL, NULL, 0, g_current_scene->get_state().map);
             
+			//sets box position and scale for when it can be rendered
             box->set_position(glm::vec3(g_current_scene->get_state().player->get_position().x, g_current_scene->get_state().player->get_position().y, 0));
             box->set_scale(glm::vec3(18.0f, 7.0f, 0.0f));
             box->update(0, NULL, NULL, 0, g_current_scene->get_state().map);
@@ -481,11 +529,12 @@ void render()
         //renders a win message when the final stage is cleared
         if (g_current_scene == g_level_c && g_current_scene->win)
         {
-            g_current_scene->get_state().player->set_position(glm::vec3(-100, -100, 0));
+            g_current_scene->turn_off();
             Utility::draw_text(&g_shader_program, text_texture_id, "You WIN!!!!!!!",
                 .75, .01, glm::vec3(g_current_scene->get_state().player->get_position().x - 3, g_current_scene->get_state().player->get_position().y + 1, 0.0f));
         }
 
+        //displays basic levelup ui
         if (g_current_scene->levelup)
 		{
             Utility::draw_text(&g_shader_program, text_texture_id, "LEVEL UP",
@@ -503,12 +552,20 @@ void render()
             Utility::draw_text(&g_shader_program, text_texture_id, "6: Firerate Boost",
                 .45, .01, glm::vec3(g_current_scene->get_state().player->get_position().x + 1, g_current_scene->get_state().player->get_position().y - 2.5, 0.0f));
 		}
+
+
+        //renders a lose message when the players health reaches 0
+        if (g_current_scene->get_state().player->get_paused())
+        {
+            Utility::draw_text(&g_shader_program, text_texture_id, "PAUSED",
+                .75, .01, glm::vec3(g_current_scene->get_state().player->get_position().x - 2, g_current_scene->get_state().player->get_position().y + 1, 0.0f));
+        }
     }
     SDL_GL_SwapWindow(g_display_window);
 }
 void level_clear()
 {
-    //saves stats for the next level
+    //saves stats for the next level from the previous
     if (g_current_scene == g_level_b)
     {
         g_level_b->max_health = g_level_a->get_state().player->get_max_health();
@@ -547,6 +604,8 @@ void shutdown()
     delete g_start;
     delete health;
     delete box;
+    Mix_FreeChunk(win_sfx);
+    Mix_FreeChunk(lose_sfx);
 }
 
 // ————— GAME LOOP ————— //
