@@ -44,19 +44,19 @@ unsigned int LEVEL_A_DATA[] =
 
 LevelA::~LevelA()
 {
-    
-    delete    m_game_state.player;
+
+    delete m_game_state.player;
     delete m_game_state.bubble;
 
     for (int i = 0; i < m_number_of_enemies; i++)
     {
         delete m_game_state.enemies[i];
     }
-    delete    m_game_state.map;
+    delete m_game_state.map;
 
-	Mix_FreeChunk(m_game_state.bubble_sfx);
+    Mix_FreeChunk(m_game_state.bubble_sfx);
     Mix_FreeMusic(m_game_state.bgm);
-    
+
 }
 
 void LevelA::initialise()
@@ -66,7 +66,7 @@ void LevelA::initialise()
     GLuint map_texture_id = Utility::load_texture(MAP_TILESET_FILEPATH);
     m_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_A_DATA, map_texture_id, 1.0f, 15, 8);
 
-    // ————— GEORGE SET-UP ————— //
+    // ————— ENTITY SET-UP ————— //
 
     GLuint player_texture_id = Utility::load_texture(SPRITESHEET_FILEPATH);
 	GLuint shrimp_texture_id = Utility::load_texture(SHRIMP_FILEPATH);
@@ -126,6 +126,8 @@ void LevelA::initialise()
         m_game_state.enemies[i]->set_walking(walking_animation);
 	}
 
+
+    //audio setup
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 
     m_game_state.bgm = Mix_LoadMUS(BGM_FILEPATH);
@@ -139,24 +141,27 @@ void LevelA::initialise()
 
 void LevelA::update(float delta_time)
 {
-    
+    //does not run if level is off
     if (!level_on)
     {
         return;
     }
     else
     {
+		//adds kills and exp to player
         m_game_state.player->add_kills(m_game_state.bubble->get_kills());
         m_game_state.bubble->set_kills(0);
 		m_game_state.player->add_exp(m_game_state.bubble->get_current_exp());
 		m_game_state.bubble->set_current_exp(0);
 
+        //clears the level if all enemies have been defeated
         if(m_game_state.player->get_kills() >= m_number_of_enemies)
 		{
 			clear = true;
 			return;
 		}   
 
+		//spawns enemies at a rate of 1 per second
         LevelA_timer += delta_time;
         if (LevelA_timer >= 1.0f)
         {
@@ -166,9 +171,12 @@ void LevelA::update(float delta_time)
             }
             LevelA_timer = 0.0f;
         }
+
+        //updates bubble and player
         attack_rate -= delta_time;
         if (m_game_state.player->get_is_active())
         {
+            //bubble logic based on its attack rate
             m_game_state.player->update(delta_time, m_game_state.player, NULL, 0, m_game_state.map);
 
             if (attack_rate <= 0.0f)
@@ -184,6 +192,8 @@ void LevelA::update(float delta_time)
                     attack_rate = m_game_state.bubble->get_rate();
                     m_game_state.bubble->activate();
                     Mix_PlayChannel(-1, m_game_state.bubble_sfx, 0);
+
+                    //resets enemies to be hit again
                     for (int i = 0; i < LevelA_current_enemies; i++)
                     {
                         if (m_game_state.enemies[i]->get_collided_projectile())
@@ -194,10 +204,11 @@ void LevelA::update(float delta_time)
                 }
             }
 
+            //shoots projectile in the direction of mouse
             m_game_state.bubble->ai_bubble(mouse_position);
             m_game_state.bubble->update(delta_time, m_game_state.player, NULL, 0 , m_game_state.map);
 
-
+            //collision checking on player and projectile side
             for (int i = 0; i < LevelA_current_enemies; i++)
             {
                 m_game_state.player->check_collision_x(m_game_state.enemies[i], 1);
@@ -207,6 +218,7 @@ void LevelA::update(float delta_time)
             }
         }
 
+        //updates enemies
         for (int i = 0; i < LevelA_current_enemies; i++)
         {
             m_game_state.enemies[i]->update(delta_time, m_game_state.player, NULL, 0, m_game_state.map);
@@ -245,13 +257,13 @@ void LevelA::render(ShaderProgram* g_shader_program)
 
 void LevelA::kill()
 {
+    //instant wins
     clear = true;
 }
 
 void LevelA::turn_on()
 {
-    
-
+    //lets everything move again
     for (int i = 0; i < m_number_of_enemies; i++)
     {
         m_game_state.enemies[i]->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -271,7 +283,7 @@ void LevelA::turn_on()
 }
 void LevelA::turn_off()
 {
-    
+    //pauses the level
     level_on = false;
     for (int i = 0; i < m_number_of_enemies; i++)
     {

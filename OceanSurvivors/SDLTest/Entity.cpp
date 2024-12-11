@@ -365,9 +365,11 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
 
         if (collidable_entity == this)
         {
-			continue;
+            continue;
         }
 
+
+        //entity collision
         if (check_collision(collidable_entity))
         {
             float y_distance = fabs(m_position.y - collidable_entity->m_position.y);
@@ -376,20 +378,28 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
 
             if (collidable_entity->m_entity_type == ENEMY && m_entity_type != ENEMY)
             {
+                //if the entity is an enemy and we are a projectile, do projectile logic
                 if (m_entity_type == PROJECTILE && m_is_active)
                 {
                     if (!collidable_entity->m_collided_projectile)
                     {
 
+                        //make sure the enemy can only be hit once per projectile
                         collidable_entity->change_projectile();
+
+                        //adjust "pierce" which is the projectile health
                         m_current_health -= 1;
+
+						//if the projectile is out of pierce, deactivate it
                         if (m_current_health <= 0.0f)
                         {
                             m_is_active = false;
                         }
 
+                        //deals damage to entity
                         collidable_entity->take_damage(m_damage);
 
+                        //deactivate entity if they are out of health and increment exp and kills
                         if (collidable_entity->get_health() <= 0.0f)
                         {
                             collidable_entity->deactivate();
@@ -403,6 +413,7 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
 
                 else
                 {
+                    //if we are a player, take damage and set damage timer, giving invulnerability for a short time
                     if (m_entity_type == PLAYER)
                     {
                         if (can_take_damage)
@@ -414,15 +425,18 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
                 }
             }
 
+            //if colliding with an enemy projectile
             if (collidable_entity->get_ai_type() == ENEMY_PROJECTILE)
             {
-
+				//if we are a player, then we take damage and set damage timer
                 if (m_entity_type == PLAYER && can_take_damage)
                 {
                     collidable_entity->take_damage(100);
                     m_current_health -= collidable_entity->get_damage();
                     can_take_damage = false;
                 }
+
+                //projectiles will do damage to each other
                 else
                 {
                     collidable_entity->take_damage(m_damage);
@@ -430,11 +444,13 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
                 }
             }
 
+			//deactivate entity if they are out of health
             if (collidable_entity->get_health() <= 0.0f)
             {
                 collidable_entity->deactivate();
             }
 
+			//deactivate projectile and player if they are out of health and reset projectile timer
             if (m_current_health <= 0.0f)
             {
                 m_is_active = false;
@@ -448,7 +464,7 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
                 m_position.y -= y_overlap + .25;
 
                 m_velocity.y = 0;
-                
+
 
                 // Collision!
                 m_collided_top = true;
@@ -457,9 +473,9 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
             else if (m_velocity.y < 0 && m_entity_type != PROJECTILE)
             {
                 m_position.y += y_overlap + .25;
-                
+
                 m_velocity.y = 0;
-                
+
                 //Collision!
                 m_collided_bottom = true;
             }
@@ -533,7 +549,7 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
                 {
                     collidable_entity->take_damage(100);
                     m_current_health -= collidable_entity->get_damage();
-					can_take_damage = false;
+                    can_take_damage = false;
                 }
             }
 
@@ -563,9 +579,9 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
             else if (m_velocity.x < 0 && m_entity_type != PROJECTILE)
             {
                 m_position.x += x_overlap + .25;
-                
+
                 m_velocity.x = 0;
-                
+
                 // Collision!
                 m_collided_left = true;
             }
@@ -656,7 +672,7 @@ void const Entity::check_collision_x(Map* map)
     }
     if (map->is_solid(right, &penetration_x, &penetration_y) && m_velocity.x > 0)
     {
-        //For whatever this small value added to the right adjustment fixes a clipping problem
+        //For whatever reason this small value added to the right adjustment fixes a clipping problem
         m_position.x -= penetration_x + .01;
         m_velocity.x = 0;
         m_collided_right = true;
@@ -676,6 +692,7 @@ void const Entity::check_collision_x(Map* map)
 
 void Entity::update(float delta_time, Entity* player, Entity* collidable_entities, int collidable_entity_count, Map* map)
 {
+    //does nothing if the entity is paused
     if (!paused)
     {
         if (!m_is_active) return;
@@ -685,8 +702,10 @@ void Entity::update(float delta_time, Entity* player, Entity* collidable_entitie
         m_collided_left = false;
         m_collided_right = false;
 
+        //activate enemies if we give a player
         if (m_entity_type == ENEMY && player != NULL) ai_activate(player);
 
+        //projectile firing timer
         if (m_entity_type == PROJECTILE || m_ai_type == ENEMY_PROJECTILE)
         {
             m_projectile_time -= delta_time;
@@ -697,6 +716,7 @@ void Entity::update(float delta_time, Entity* player, Entity* collidable_entitie
             }
         }
 
+		//player invulnerability timer
         if (m_entity_type == PLAYER)
         {
             if (!can_take_damage)

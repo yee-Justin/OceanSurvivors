@@ -48,7 +48,7 @@ unsigned int LEVEL_B_DATA[] =
 LevelB::~LevelB()
 {
     
-    delete    m_game_state.player;
+    delete m_game_state.player;
     delete m_game_state.bubble;
 
     for (int i = 0; i < m_number_of_enemies; i++)
@@ -61,7 +61,7 @@ LevelB::~LevelB()
         delete m_game_state.projectiles[i];
     }
 
-    delete    m_game_state.map;
+    delete m_game_state.map;
 
     Mix_FreeChunk(m_game_state.bubble_sfx);
     Mix_FreeMusic(m_game_state.bgm);
@@ -75,7 +75,7 @@ void LevelB::initialise()
     GLuint map_texture_id = Utility::load_texture(MAP_TILESET_FILEPATH);
     m_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_B_DATA, map_texture_id, 1.0f, 15, 8);
 
-    // ————— GEORGE SET-UP ————— //
+    // ————— ENTITY SET-UP ————— //
 
     GLuint player_texture_id = Utility::load_texture(SPRITESHEET_FILEPATH);
     GLuint shrimp_texture_id = Utility::load_texture(SHRIMP_FILEPATH);
@@ -126,6 +126,8 @@ void LevelB::initialise()
     m_game_state.bubble->set_timer(m_game_state.bubble->get_rate());
 	m_game_state.bubble->set_projectile_time(m_game_state.player->get_projectile_time());
 
+
+    //clam enemy setup
     int random_pos;
     for (int i = 0; i < m_number_of_enemies; i++)
     {
@@ -149,6 +151,8 @@ void LevelB::initialise()
 		m_game_state.enemies[i]->set_projectile_time(2.0f);
 		m_game_state.enemies[i]->set_pierce(5.0f);
 
+
+        //each clam has its own projectile
         m_game_state.projectiles.push_back(new Entity(clamprojectile_id, 5.0f, 1.0, m_game_state.enemies[i]->get_damage(), 0.0f, 0.5f, 0.5f, PROJECTILE, ENEMY_PROJECTILE, IDLE));
         m_game_state.projectiles[i]->deactivate();
         m_game_state.projectiles[i]->set_position(m_game_state.enemies[i]->get_position());
@@ -234,6 +238,7 @@ void LevelB::update(float delta_time)
             }
             
             
+            //enemy projectile logic, similar to bubble projectile logic
             if (enemy_attack_rate <= 0.0f)
             {
                 player_position = m_game_state.player->get_position();
@@ -266,7 +271,7 @@ void LevelB::update(float delta_time)
             m_game_state.bubble->update(delta_time, m_game_state.player, NULL, 0,
                 m_game_state.map);
 
-
+            //now also checks for collision with enemy projectile
             for (int i = 0; i < LevelB_current_enemies; i++)
             {
                 m_game_state.player->check_collision_x(m_game_state.enemies[i], 1);
@@ -282,6 +287,7 @@ void LevelB::update(float delta_time)
             }
         }
 
+        //updates enemies and enemy projectiles
         for (int i = 0; i < LevelB_current_enemies; i++)
         {
             m_game_state.enemies[i]->update(delta_time, m_game_state.player, NULL, 0, m_game_state.map);

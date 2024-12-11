@@ -55,7 +55,7 @@ unsigned int LEVEL_C_DATA[] =
 LevelC::~LevelC()
 {
 
-    delete    m_game_state.player;
+    delete m_game_state.player;
     delete m_game_state.bubble;
     delete m_game_state.boss;
     for (int i = 0; i < m_number_of_enemies; i++)
@@ -68,7 +68,7 @@ LevelC::~LevelC()
         delete m_game_state.projectiles[i];
     }
 
-    delete    m_game_state.map;
+    delete m_game_state.map;
 
     Mix_FreeChunk(m_game_state.bubble_sfx);
 
@@ -85,7 +85,7 @@ void LevelC::initialise()
     GLuint map_texture_id = Utility::load_texture(MAP_TILESET_FILEPATH);
     m_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_C_DATA, map_texture_id, 1.0f, 15, 8);
 
-    // ————— GEORGE SET-UP ————— //
+    // ————— ENTITY SET-UP ————— //
 
     GLuint player_texture_id = Utility::load_texture(SPRITESHEET_FILEPATH);
     GLuint shrimp_texture_id = Utility::load_texture(SHRIMP_FILEPATH);
@@ -182,6 +182,7 @@ void LevelC::initialise()
             m_game_state.enemies[i]->set_pierce(5.0f);
         }
 
+        //enemies still each get their own projectile so we can match the projectile to the enemy type that will be shooting
         m_game_state.projectiles.push_back(new Entity(clamprojectile_id, 5.0f, 1.0, m_game_state.enemies[i]->get_damage(), 0.0f, 0.5f, 0.5f, PROJECTILE, ENEMY_PROJECTILE, IDLE));
         m_game_state.projectiles[i]->deactivate();
         m_game_state.projectiles[i]->set_position(m_game_state.enemies[i]->get_position());

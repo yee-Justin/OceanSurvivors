@@ -68,6 +68,7 @@ WIN_SFX_FILEPATH[] = "assets/win.wav", // From https://opengameart.org/content/w
 LOSE_SFX_FILEPATH[] = "assets/lose.wav"; // From https://opengameart.org/content/game-over-trumpet-sfx
 
 
+//stuff that is used for the entire game
 GLuint text_texture_id;
 
 Entity* health;
@@ -80,6 +81,8 @@ Mix_Chunk* lose_sfx;
 bool win_sound = true;
 bool lose_sound = true;
 
+
+//level up stuff
 int level = 1;
 int levelup_requirement = 10;
 
@@ -116,6 +119,8 @@ glm::mat4 g_view_matrix, g_projection_matrix;
 float g_previous_ticks = 0.0f,
 g_accumulator = 0.0f;
 
+
+//calculates mouse position
 enum Coordinate { x_coordinate, y_coordinate };
 
 const Coordinate X_COORDINATE = x_coordinate;
@@ -133,6 +138,7 @@ float get_screen_to_ortho(float coordinate, Coordinate axis)
     default: return 0.0f;
     }
 }
+
 void initialise();
 void process_input();
 void update();
@@ -143,6 +149,7 @@ void level_clear();
 void switch_to_scene(Scene* scene)
 {
     g_current_scene = scene;
+    //if the current scene is level b or level c, we update player using previous level information
 	if (g_current_scene == g_level_b || g_current_scene == g_level_c)
 	{
 		level_clear();
@@ -210,6 +217,8 @@ void initialise()
     box = new Entity(box_texture_id, 0.0f, 1, 1, OBJECT);
     background = new Entity(background_texture_id, 0.0f, 1, 1, OBJECT);
 
+
+	//load sound effects
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     win_sfx = Mix_LoadWAV(WIN_SFX_FILEPATH);
     lose_sfx = Mix_LoadWAV(LOSE_SFX_FILEPATH);
@@ -221,6 +230,7 @@ void initialise()
 
 void process_input()
 {
+    //resets player position when the player actually exists and the level is on
     if (g_current_scene != g_start && g_current_scene->level_on)
     {
         g_current_scene->get_state().player->set_movement(glm::vec3(0.0f));
@@ -236,12 +246,15 @@ void process_input()
             break;
 
         case SDL_KEYDOWN:
-            switch (event.key.keysym.sym) {
+            switch (event.key.keysym.sym) 
+            {
+            
             case SDLK_q:
                 // Quit the game with a keystroke
                 g_app_status = TERMINATED;
                 break;
-			case SDLK_RETURN:
+			
+            case SDLK_RETURN:
 				// Start the game with a keystroke
 				if (g_current_scene == g_start)
 				{
@@ -249,7 +262,6 @@ void process_input()
 					switch_to_scene(g_level_a);
 				}
 				break;
-
 
             case SDLK_p:
 				// Pause the game
@@ -266,6 +278,7 @@ void process_input()
                     g_current_scene->turn_on();
                 }
                 break;
+
             case SDLK_l:
 				// Level up
 				if (g_current_scene != g_start)
@@ -309,8 +322,7 @@ void process_input()
                 g_current_scene->get_state().player->move_down();
             }
 
-
-            //quickly moves to the next scenes
+            //quickly moves to the next levels
             if (key_state[SDL_SCANCODE_K])
             {
                 // Instant win
@@ -380,7 +392,7 @@ void update()
     float delta_time = ticks - g_previous_ticks;
     g_previous_ticks = ticks;
 
-
+    //the background is always updated
     background->set_position(glm::vec3(10.0f, -10.0f, 0.0f));
     background->set_scale(glm::vec3(40.0f, 40.0f, 1.0f));
 	background->update(0, NULL, NULL, 0, g_current_scene->get_state().map);
@@ -414,7 +426,6 @@ void update()
             }
 
 
-
             //updating game
             delta_time += g_accumulator;
 
@@ -424,7 +435,7 @@ void update()
                 return;
             }
 
-            //grabs a scaled up position of the mouse
+            //grabs a scaled up position of the mouse position
             int x, y;
 
             SDL_GetMouseState(&x, &y);
@@ -521,20 +532,16 @@ void render()
     //renders game shaders and scenes
     if (g_current_scene != g_start)
     {
-
-
         g_shader_program.set_view_matrix(g_view_matrix);
 
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(g_shader_program.get_program_id());
 
-
-
         background->render(&g_shader_program);
         g_current_scene->render(&g_shader_program);
 
         //renders the scene when the game is playing
-            //box will be rendered first on levelup so everything else will be on top of it
+        //box will be rendered after the scene on levelup so everything else will be on top of it
         if (g_current_scene->levelup)
         {
             box->render(&g_shader_program);
@@ -600,8 +607,7 @@ void render()
                 .45, .01, glm::vec3(g_current_scene->get_state().player->get_position().x + 1, g_current_scene->get_state().player->get_position().y - 2.5, 0.0f));
         }
 
-
-        //renders a lose message when the players health reaches 0
+        //renders pause message
         if (g_current_scene->get_state().player->get_paused() && !g_current_scene->win && !g_current_scene->levelup)
         {
             Utility::draw_text(&g_shader_program, text_texture_id, "PAUSED",
