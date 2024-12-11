@@ -1,3 +1,13 @@
+/**
+* Author: Justin Yee
+* Assignment: Ocean Survivors
+* Date due: December 11, 2024, 2:00pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
 #define GL_SILENCE_DEPRECATION
 #define STB_IMAGE_IMPLEMENTATION
 #define LOG(argument) std::cout << argument << '\n'
@@ -39,8 +49,8 @@ constexpr int WINDOW_WIDTH = 640 * 2,
 WINDOW_HEIGHT = 480 * 2;
 
 constexpr float BG_RED = 0.0f,
-BG_BLUE = 0.0f,
-BG_GREEN = 0.0f,
+BG_BLUE = .50f,
+BG_GREEN = 1.0f,
 BG_OPACITY = 1.0f;
 
 constexpr int VIEWPORT_X = 0,
@@ -53,13 +63,16 @@ constexpr char GAME_WINDOW_NAME[] = "FORM!";
 constexpr char HEALTH_FILEPATH[] = "assets/health.png", //From https://adwitr.itch.io/pixel-health-bar-asset-pack-2 (edited for color)
 BOX_FILEPATH[] = "assets/bluebox.png", //just a blue box made in paint
 TEXT_FILEPATH[] = "assets/font1.png",
+BACKGROUND_FILEPATH[] = "assets/background.png", //From https://opengameart.org/content/water-textures
 WIN_SFX_FILEPATH[] = "assets/win.wav", // From https://opengameart.org/content/win-music-3
 LOSE_SFX_FILEPATH[] = "assets/lose.wav"; // From https://opengameart.org/content/game-over-trumpet-sfx
+
 
 GLuint text_texture_id;
 
 Entity* health;
 Entity* box;
+Entity* background;
 
 Mix_Chunk* win_sfx;
 Mix_Chunk* lose_sfx;
@@ -191,10 +204,11 @@ void initialise()
     text_texture_id = Utility::load_texture(TEXT_FILEPATH);
     GLuint health_texture_id = Utility::load_texture(HEALTH_FILEPATH);
 	GLuint box_texture_id = Utility::load_texture(BOX_FILEPATH);
+    GLuint background_texture_id = Utility::load_texture(BACKGROUND_FILEPATH);
 
     health = new Entity(health_texture_id, 0.0f, 1, 1, HEALTH);
     box = new Entity(box_texture_id, 0.0f, 1, 1, OBJECT);
-
+    background = new Entity(background_texture_id, 0.0f, 1, 1, OBJECT);
 
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
     win_sfx = Mix_LoadWAV(WIN_SFX_FILEPATH);
@@ -367,6 +381,10 @@ void update()
     g_previous_ticks = ticks;
 
 
+    background->set_position(glm::vec3(10.0f, -10.0f, 0.0f));
+    background->set_scale(glm::vec3(40.0f, 40.0f, 1.0f));
+	background->update(0, NULL, NULL, 0, g_current_scene->get_state().map);
+
     //updates the start screen when the current scene is start
 	if (g_current_scene == g_start)
 	{
@@ -474,8 +492,6 @@ void update()
             // ————— PLAYER CAMERA ————— //
             g_view_matrix = glm::mat4(1.0f);
             g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-g_current_scene->get_state().player->get_position().x, -g_current_scene->get_state().player->get_position().y, 0));
-
-			std::cout << g_current_scene->get_state().player->get_position().x << " " << g_current_scene->get_state().player->get_position().y << std::endl;
         }
     }
 
@@ -511,6 +527,10 @@ void render()
 
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(g_shader_program.get_program_id());
+
+
+
+        background->render(&g_shader_program);
         g_current_scene->render(&g_shader_program);
 
         //renders the scene when the game is playing

@@ -22,9 +22,12 @@ void Entity::ai_activate(Entity* entities)
     case PAUSED:
         ai_paused(entities);
         break;
-
 	case CLAM:
 		ai_clam(entities);
+		break;
+
+    case BOSS:
+		ai_boss(entities);
 		break;
     default:
         break;
@@ -33,7 +36,10 @@ void Entity::ai_activate(Entity* entities)
 
 void Entity::ai_follower(Entity* entities)
 {
-    switch (m_ai_state) {
+    switch (m_ai_state) 
+    {
+
+    //enemies will basically always move towards the player
     case IDLE:
 		m_movement = glm::vec3(0.0f, 0.0f, 0.0f);
         if (glm::distance(m_position, entities->get_position()) < 1000.0f) { m_ai_state = WALKING; }
@@ -69,7 +75,7 @@ void Entity::ai_follower(Entity* entities)
 
 void Entity::ai_clam(Entity* entities)
 {
-
+    //clams will move towards the player up to a certain distance
     if (glm::distance(m_position, entities->get_position()) > 6.0f)
     {
         if (m_position.x > entities->get_position().x)
@@ -96,6 +102,7 @@ void Entity::ai_clam(Entity* entities)
     }
     else
     {
+		//then clams will stop moving and just face the player while its projectiles shoot at the player
         m_movement = glm::vec3(0.0f, 0.0f, 0.0f);
         if (m_position.x > entities->get_position().x)
         {
@@ -143,6 +150,82 @@ void Entity::ai_enemy_projectile(glm::vec3 player_pos)
     // Scale the direction vector by the desired movement speed
     m_movement = direction * m_speed;
 
+}
+
+
+void Entity::ai_boss(Entity* entities)
+{
+	switch (m_ai_state) 
+    {
+	case IDLE:
+		m_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+		if (glm::distance(m_position, entities->get_position()) < 1000.0f) { m_ai_state = WALKING; }
+		break;
+
+    //The boss will always go towards the player
+	case WALKING:
+		if (m_position.x > entities->get_position().x)
+		{
+			m_movement.x = -1.0f;
+			face_left();
+		}
+		if (m_position.x < entities->get_position().x)
+		{
+			m_movement.x = 1.0f;
+			face_right();
+		}
+
+		if (m_position.y > entities->get_position().y)
+		{
+			m_movement.y = -1.0f;
+		}
+		if (m_position.y < entities->get_position().y)
+		{
+			m_movement.y = 1.0f;
+		}
+        if (glm::distance(m_position, entities->get_position()) < 6.0f) { m_ai_state = ATTACK; }
+
+		break;
+
+    case ATTACK:
+
+
+        //when the boss gets close enough, he does a "dash" attack, speeding past the player
+        if (glm::distance(m_position, entities->get_position()) < 6.0f)
+        {
+            if (!m_attacking)
+            {
+                // Calculate the direction vector towards the cursor position
+                glm::vec3 direction = entities->get_position() - m_position;
+
+                // Normalize the direction vector to get consistent speed
+                direction = glm::normalize(direction);
+
+
+                // Scale the direction vector by the desired movement speed
+                m_movement = direction * m_speed;
+
+				m_attacking = true;
+            }
+        }
+
+        if (m_movement.x > 0)
+        {
+            face_right();
+        }
+
+        else if (m_movement.x < 0)
+        {
+			face_left();
+        }
+
+        //the dash will take the boss a bit further away than usual
+        if (glm::distance(m_position, entities->get_position()) > 10.0f) { m_ai_state = WALKING; m_attacking = false; }
+
+		break;
+	default:
+		break;
+	}
 }
 
 void Entity::levelup(int choice)
@@ -649,7 +732,7 @@ void Entity::update(float delta_time, Entity* player, Entity* collidable_entitie
 
 
         //non_enemies can pass through objects
-        if (m_ai_type != FOLLOWER && m_ai_type != CLAM && m_ai_type != ENEMY_PROJECTILE)
+        if (m_ai_type != FOLLOWER && m_ai_type != CLAM && m_ai_type != ENEMY_PROJECTILE && m_ai_type != BOSS)
         {
 
             m_velocity.x = m_movement.x * m_speed;

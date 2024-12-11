@@ -13,7 +13,7 @@ CLAMPROJECTILE_FILEPATH[] = "assets/clamprojectile.png",
 BOSS_FILEPATH[] = "assets/boss.png",
 
 
-MAP_TILESET_FILEPATH[] = "assets/map.png", //From https://opengameart.org/content/tile-map-dark-2d-platformer
+MAP_TILESET_FILEPATH[] = "assets/tileset.png", //From https://axulart.itch.io/axularts-beach-and-caves-tileset
 
 BGM_FILEPATH[] = "assets/LevelC_theme.mp3", //From Incompetech, "Mountain Emperor"
 
@@ -30,29 +30,26 @@ bool boss_music = false;
 
 unsigned int LEVEL_C_DATA[] =
 {
-    36, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 49,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    18, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 87,
+    48, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 50,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  110,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  110,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  52,  0,  0,  0,  0,  0,  53,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  53,  0,  0,  0,  0,  0,  52, 0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  110,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  110,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    108, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  109,
+    78, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 79, 80,
 };
 
 LevelC::~LevelC()
@@ -86,7 +83,7 @@ void LevelC::initialise()
 
     // ————— MAP SET-UP ————— //
     GLuint map_texture_id = Utility::load_texture(MAP_TILESET_FILEPATH);
-    m_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_C_DATA, map_texture_id, 1.0f, 6, 14);
+    m_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_C_DATA, map_texture_id, 1.0f, 15, 8);
 
     // ————— GEORGE SET-UP ————— //
 
@@ -151,7 +148,7 @@ void LevelC::initialise()
 
         if (random_enemy == 0)
         {
-            m_game_state.enemies.push_back(new Entity(shrimp_texture_id, 1.0f, 10.0f, 25.0f, 0.0f, 0.25f, 0.25f, ENEMY, FOLLOWER, IDLE));
+            m_game_state.enemies.push_back(new Entity(shrimp_texture_id, 1.50f, 25.0f, 20.0f, 0.0f, 0.25f, 0.25f, ENEMY, FOLLOWER, IDLE));
             m_game_state.enemies[i]->set_position(enemy_positions[random_pos]);
             m_game_state.enemies[i]->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
             m_game_state.enemies[i]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -166,7 +163,7 @@ void LevelC::initialise()
         }
         if (random_enemy == 1)
         {
-            m_game_state.enemies.push_back(new Entity(clam_texture_id, 1.0f, 10.0f, 10.0f, 2.0f, 0.5f, 0.5f, ENEMY, CLAM, WALKING));
+            m_game_state.enemies.push_back(new Entity(clam_texture_id, 1.50f, 20.0f, 10.0f, 2.0f, 0.5f, 0.5f, ENEMY, CLAM, WALKING));
             m_game_state.enemies[i]->set_position(enemy_positions[random_pos]);
             m_game_state.enemies[i]->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
             m_game_state.enemies[i]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -198,7 +195,7 @@ void LevelC::initialise()
     }
 
     //initializes boss rather far away
-    m_game_state.boss = new Entity(boss_texture_id, 4.0f, 10.0f, 20.0f, 2.0f, 3.0f, 2.0f, ENEMY, PAUSED, IDLE);
+    m_game_state.boss = new Entity(boss_texture_id, 3.0f, 500.0f, 30.0f, 2.0f, 3.0f, 2.0f, ENEMY, PAUSED, IDLE);
     m_game_state.boss->set_position(glm::vec3(-20.0f, -10.0f, 0.0f));
     m_game_state.boss->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
     m_game_state.boss->set_scale(glm::vec3(7.0f, 7.0f, 1.0f));
@@ -281,7 +278,7 @@ void LevelC::update(float delta_time)
         if (boss_timer >= 30.0f && !boss_music)
         {
             boss_time = true;
-			m_game_state.boss->set_ai_type(FOLLOWER);
+			m_game_state.boss->set_ai_type(BOSS);
             Mix_HaltMusic();
             Mix_PlayMusic(m_game_state.boss_bgm, -1);
 			boss_music = true;
@@ -336,7 +333,7 @@ void LevelC::update(float delta_time)
                     //only shoots if the clam is alive
                     if (m_game_state.enemies[i]->get_is_active())
                     {
-                        if (m_game_state.enemies[i]->get_ai_state() == CLAM && m_game_state.enemies[i]->get_ai_state() == IDLE && !m_game_state.projectiles[i]->get_is_active())
+                        if (m_game_state.enemies[i]->get_ai_type() == CLAM && m_game_state.enemies[i]->get_ai_state() == IDLE && !m_game_state.projectiles[i]->get_is_active())
                         {
                             m_game_state.projectiles[i]->set_position(m_game_state.enemies[i]->get_position());
                             m_game_state.projectiles[i]->set_health(m_game_state.enemies[i]->get_pierce());
@@ -355,7 +352,7 @@ void LevelC::update(float delta_time)
                     }
                 }
                 //resets enemy attack timer
-                enemy_attack_rate = m_game_state.enemies[0]->get_rate();
+                enemy_attack_rate = 2.5f;
             }
 
 
@@ -470,12 +467,11 @@ void LevelC::turn_on()
     m_game_state.bubble->set_ai_type(BUBBLE);
     m_game_state.bubble->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
     m_game_state.bubble->unpause();
-	m_game_state.boss->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
-
+	
     //if the boss has not "spawned" yet, do not make it move
     if (boss_time)
     {
-        m_game_state.boss->set_ai_type(FOLLOWER);
+        m_game_state.boss->set_ai_type(BOSS);
     }
     m_game_state.boss->unpause();
 
@@ -502,7 +498,6 @@ void LevelC::turn_off()
     m_game_state.bubble->set_ai_type(PAUSED);
     m_game_state.bubble->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
     m_game_state.bubble->pause();
-	m_game_state.boss->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
 	m_game_state.boss->set_ai_type(PAUSED);
 	m_game_state.boss->pause();
 

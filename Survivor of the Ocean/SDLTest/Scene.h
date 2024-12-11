@@ -28,6 +28,7 @@ struct GameState
 
     Entity* bubble;
     Entity* menu;
+    Entity* background;
     Entity* boss;
 
     Entity* text;
@@ -46,7 +47,7 @@ protected:
     
 public:
 
-    int m_number_of_enemies = 10;
+    int m_number_of_enemies = 25;
     int m_enemies_defeated = 0;
 
     float max_health;

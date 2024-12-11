@@ -8,7 +8,7 @@ SHRIMP_FILEPATH[] = "assets/shrimp.png",
 BUBBLE_FILEPATH[] = "assets/bubble.png",
 CLAM_FILEPATH[] = "assets/clam.png",
 
-MAP_TILESET_FILEPATH[] = "assets/map.png", //From https://opengameart.org/content/tile-map-dark-2d-platformer
+MAP_TILESET_FILEPATH[] = "assets/tileset.png", //From https://axulart.itch.io/axularts-beach-and-caves-tileset
 
 BGM_FILEPATH[] = "assets/levelA_theme.mp3", //From https://opengameart.org/content/underwater-theme-ii
 
@@ -19,29 +19,26 @@ float LevelA_timer = 0.0f;
 
 unsigned int LEVEL_A_DATA[] =
 {
-    36, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 49,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  55,
-    18, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 87,
+    45, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 47,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    105, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  106,
+    75, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76, 77,
 };
 
 
@@ -67,7 +64,7 @@ void LevelA::initialise()
     
     // ————— MAP SET-UP ————— //
     GLuint map_texture_id = Utility::load_texture(MAP_TILESET_FILEPATH);
-    m_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_A_DATA, map_texture_id, 1.0f, 6, 14);
+    m_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_A_DATA, map_texture_id, 1.0f, 15, 8);
 
     // ————— GEORGE SET-UP ————— //
 
@@ -115,11 +112,11 @@ void LevelA::initialise()
 	{
 		random_pos = rand() % 76; //picks a random position for the enemy to spawn
 
-		m_game_state.enemies.push_back(new Entity(shrimp_texture_id, 1.0f, 10.0f, 25.0f, 0.0f, 0.25f, 0.25f, ENEMY, FOLLOWER, IDLE));
+		m_game_state.enemies.push_back(new Entity(shrimp_texture_id, 1.0f, 10.0f, 10.0f, 0.0f, 0.25f, 0.25f, ENEMY, FOLLOWER, IDLE));
 		m_game_state.enemies[i]->set_position(enemy_positions[random_pos]);
         m_game_state.enemies[i]->set_acceleration(glm::vec3(0.0f,0.0f,0.0f));
 		m_game_state.enemies[i]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
-        m_game_state.enemies[i]->set_exp(50);
+        m_game_state.enemies[i]->set_exp(10);
 
         m_game_state.enemies[i]->set_animation_cols(8);
         m_game_state.enemies[i]->set_animation_rows(1);

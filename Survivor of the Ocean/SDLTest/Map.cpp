@@ -52,9 +52,9 @@ void Map::build()
     }
     
     // The bounds are dependent on the size of the tiles
-    m_left_bound   = 0 - (m_tile_size / 2);
+    m_left_bound   = 0.0 - (m_tile_size / 2);
     m_right_bound  = (m_tile_size * m_width) - (m_tile_size / 2);
-    m_top_bound    = 0 + (m_tile_size / 2);
+    m_top_bound    = 0.0 + (m_tile_size / 2);
     m_bottom_bound = -(m_tile_size * m_height) + (m_tile_size / 2);
 }
 

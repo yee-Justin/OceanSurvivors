@@ -6,8 +6,8 @@
 #include "glm/glm.hpp"
 #include "ShaderProgram.h"
 enum EntityType { PLATFORM, PLAYER, ENEMY, HEALTH, PROJECTILE, OBJECT};
-enum AIType { PAUSED, FOLLOWER, CLAM, BUBBLE, ENEMY_PROJECTILE };
-enum AIState { WALKING, IDLE };
+enum AIType { PAUSED, FOLLOWER, CLAM, BUBBLE, ENEMY_PROJECTILE, BOSS };
+enum AIState { WALKING, IDLE, ATTACK };
 
 
 enum AnimationDirection { LEFT, RIGHT};
@@ -57,6 +57,7 @@ private:
     bool m_collided_projectile = false;
     bool can_take_damage = true;
     bool paused = false;
+    bool m_attacking = false;
 
     // ----- STATS ----- //
     float m_projectile_speed = 3.0f;
@@ -107,6 +108,7 @@ public:
     void ai_paused(Entity* entities);
     void ai_bubble(glm::vec3 cursor_pos);
     void ai_enemy_projectile(glm::vec3 player_pos);
+	void ai_boss(Entity* entities);
 
 	void levelup(int choice);
     
@@ -125,6 +127,7 @@ public:
     void take_damage(float damage) { m_current_health -= damage; }
     void reset_projectile() { m_projectile_time = m_projectile_timer; }
     void reset_damage() { m_damage_time = m_damage_timer; }
+	void can_attack_again() { m_attacking = false; }
 	void pause() { paused = true; }
 	void unpause() { paused = false; }
 	void add_kills(int kills) { m_enemies_killed += kills;}
