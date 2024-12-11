@@ -288,8 +288,3 @@ void LevelA::turn_off()
 	m_game_state.bubble->pause();
     
 }
-
-void LevelA::level_clear()
-{
-    turn_off();
-}

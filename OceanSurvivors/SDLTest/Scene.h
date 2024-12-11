@@ -108,7 +108,6 @@ public:
     virtual void kill() = 0;
     virtual void turn_on() = 0;
 	virtual void turn_off() = 0;
-    virtual void level_clear() = 0;
     
     // ————— GETTERS ————— //
     GameState const get_state() const { return m_game_state;             }

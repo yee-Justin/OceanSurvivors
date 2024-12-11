@@ -15,6 +15,4 @@ public:
     void kill();
     void turn_on() { level_on = true; }
     void turn_off() { level_on = false; }
-
-    void level_clear();
 };

@@ -502,8 +502,3 @@ void LevelC::turn_off()
 	m_game_state.boss->pause();
 
 }
-
-void LevelC::level_clear()
-{
-    turn_off();
-}

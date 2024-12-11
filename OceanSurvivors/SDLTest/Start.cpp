@@ -29,7 +29,7 @@ void Start::initialise()
     GLuint menu_texture_id = Utility::load_texture(MENU_FILEPATH);
     m_game_state.menu = new Entity(menu_texture_id, 0.0f, 1, 1, OBJECT);
 	m_game_state.menu->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
-	m_game_state.menu->set_scale(glm::vec3(50.0f, 50.0f, 1.0f));
+	m_game_state.menu->set_scale(glm::vec3(20.0f, 20.0f, 1.0f));
 
     text_texture_id = Utility::load_texture(TEXT_FILEPATH);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
@@ -51,9 +51,9 @@ void Start::render(ShaderProgram* g_shader_program)
 	m_game_state.map->render(g_shader_program);
     m_game_state.menu->render(g_shader_program);
     //draws "menu"
-        Utility::draw_text(g_shader_program, text_texture_id, "Press Enter!", .65, .01, glm::vec3(-3.5,0,0));
+    Utility::draw_text(g_shader_program, text_texture_id, "Ocean Survivors", .85, .01, glm::vec3(-6.0f, 2.5f, 0));
+    Utility::draw_text(g_shader_program, text_texture_id, "Press Enter!", .45, .01, glm::vec3(-2.5f,-2.0f,0.0f));
 }
 
 
 void Start::kill() {}
-void Start::level_clear() {}

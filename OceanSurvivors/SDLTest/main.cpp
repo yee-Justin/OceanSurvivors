@@ -58,7 +58,7 @@ VIEWPORT_Y = 0,
 VIEWPORT_WIDTH = WINDOW_WIDTH,
 VIEWPORT_HEIGHT = WINDOW_HEIGHT;
 
-constexpr char GAME_WINDOW_NAME[] = "FORM!";
+constexpr char GAME_WINDOW_NAME[] = "Ocean Survivors";
 
 constexpr char HEALTH_FILEPATH[] = "assets/health.png", //From https://adwitr.itch.io/pixel-health-bar-asset-pack-2 (edited for color)
 BOX_FILEPATH[] = "assets/bluebox.png", //just a blue box made in paint

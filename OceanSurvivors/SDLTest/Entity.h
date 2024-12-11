@@ -16,7 +16,6 @@ class Entity
 {
 private:
     bool m_is_active = true;
-    bool goal = false;
     std::vector<std::vector<int>> m_walking; // vector containing vector to enable any array as input as long as you know the correct columns and rows
 
 
@@ -122,12 +121,10 @@ public:
     void move_right() { m_movement.x = .75f;  face_right(); }
     void move_down() { m_movement.y = -.75f;}
     void move_up() { m_movement.y = .75f;}
-    void const change_goal() { goal = !goal; }
     void const change_projectile() { m_collided_projectile = !m_collided_projectile; }
     void take_damage(float damage) { m_current_health -= damage; }
     void reset_projectile() { m_projectile_time = m_projectile_timer; }
     void reset_damage() { m_damage_time = m_damage_timer; }
-	void can_attack_again() { m_attacking = false; }
 	void pause() { paused = true; }
 	void unpause() { paused = false; }
 	void add_kills(int kills) { m_enemies_killed += kills;}
@@ -167,9 +164,6 @@ public:
 
     
     bool 	  const get_is_active() const { return m_is_active; }
-
-
-	bool      const get_goal() const { return goal; }
     
     std::vector<std::vector<int>>      const get_m_walking() const { return m_walking; }
     std::vector<int>      const get_animation_indices() const { return m_animation_indices; }

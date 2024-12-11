@@ -383,8 +383,3 @@ void LevelB::turn_off()
     m_game_state.bubble->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
     m_game_state.bubble->pause();   
 }
-
-void LevelB::level_clear()
-{
-    turn_off();
-}

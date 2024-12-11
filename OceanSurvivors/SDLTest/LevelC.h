@@ -14,5 +14,4 @@ public:
     void kill() override;
     void turn_on() override;
     void turn_off() override;
-    void level_clear() override;
 };

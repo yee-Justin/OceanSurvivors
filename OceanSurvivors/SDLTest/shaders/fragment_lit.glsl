@@ -18,5 +18,5 @@ void main()
     vec4 color = texture2D(diffuse, texCoordVar);
 
     //adjusting the brightness a bit
-    gl_FragColor = vec4(color.rgb * brightness * 4, color.a);
+    gl_FragColor = vec4(color.rgb * brightness * 3.5, color.a);
 }
